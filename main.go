@@ -40,5 +40,29 @@ func SignIn(client *http.Client) bool {
 	defer response.Body.Close()
 	buf, _ := ioutil.ReadAll(response.Body)
 	fmt.Println(string(buf))
+	dingding()
 	return strings.Contains(string(buf), "成功")
+}
+
+func dingding(){
+	// 构造要发送的消息
+	message := DingTalkMessage{
+		MsgType: "text",
+		Text: struct {
+			Content string `json:"content"`
+		}{
+			Content: "Hello, DingTalk!",
+		},
+	}
+
+	// 将消息转换为JSON格式
+	messageJson, _ := json.Marshal(message)
+	DINGDING_WEBHOOK := os.Getenv("DINGDING_WEBHOOK")
+	// 发送HTTP POST请求
+	resp, err := http.Post(DINGDING_WEBHOOK,
+		"application/json", bytes.NewBuffer(messageJson))
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 }
